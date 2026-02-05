@@ -1,35 +1,46 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { useDashboard } from "@/contexts/DashboardContext";
+import { groupByCondition } from "@/lib/houseData";
+import { useMemo } from "react";
 
-const data = [
-  { ageGroup: "18-25", count: 44 },
-  { ageGroup: "26-35", count: 112 },
-  { ageGroup: "36-45", count: 51 },
-  { ageGroup: "46-55", count: 25 },
-  { ageGroup: "56+", count: 5 },
-];
-
-const AgeGroupChart = () => {
+const ConditionChart = () => {
+  const { filteredData } = useDashboard();
+  
+  const data = useMemo(() => {
+    return groupByCondition(filteredData);
+  }, [filteredData]);
+  
+  const formatPrice = (value: number) => {
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+    return `$${value}`;
+  };
+  
   return (
     <Card className="border-primary/20 shadow-sm">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold text-foreground">
-          Attrition by Age Group
+          Average Price by Condition
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[280px]">
+        <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={data} layout="vertical" margin={{ top: 10, right: 30, left: 80, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                dataKey="ageGroup" 
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                type="number"
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
+                tickFormatter={formatPrice}
               />
               <YAxis 
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                type="category"
+                dataKey="label"
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
+                width={70}
               />
               <Tooltip 
                 contentStyle={{ 
@@ -38,9 +49,9 @@ const AgeGroupChart = () => {
                   borderRadius: '8px',
                   color: 'hsl(var(--foreground))'
                 }}
-                formatter={(value: number) => [`${value} employees`, 'Left']}
+                formatter={(value: number) => [`$${value.toLocaleString()}`, 'Avg Price']}
               />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="avgPrice" radius={[0, 4, 4, 0]}>
                 {data.map((_, index) => (
                   <Cell 
                     key={`cell-${index}`} 
@@ -56,4 +67,4 @@ const AgeGroupChart = () => {
   );
 };
 
-export default AgeGroupChart;
+export default ConditionChart;

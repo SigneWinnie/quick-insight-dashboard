@@ -1,19 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { useDashboard } from "@/contexts/DashboardContext";
+import { groupByBedrooms } from "@/lib/houseData";
+import { useMemo } from "react";
 
-const data = [
-  { tenure: "0-2 years", count: 116 },
-  { tenure: "3-5 years", count: 62 },
-  { tenure: "6-10 years", count: 43 },
-  { tenure: "10+ years", count: 16 },
-];
-
-const TenureChart = () => {
+const BedroomsChart = () => {
+  const { filteredData } = useDashboard();
+  
+  const data = useMemo(() => {
+    return groupByBedrooms(filteredData).filter(d => d.bedrooms >= 1 && d.bedrooms <= 6);
+  }, [filteredData]);
+  
   return (
     <Card className="border-primary/20 shadow-sm">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold text-foreground">
-          Attrition by Years at Company
+          Properties by Bedrooms
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -22,9 +24,10 @@ const TenureChart = () => {
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                dataKey="tenure" 
+                dataKey="bedrooms" 
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
+                tickFormatter={(val) => `${val} BR`}
               />
               <YAxis 
                 tick={{ fill: 'hsl(var(--muted-foreground))' }}
@@ -37,7 +40,11 @@ const TenureChart = () => {
                   borderRadius: '8px',
                   color: 'hsl(var(--foreground))'
                 }}
-                formatter={(value: number) => [`${value} employees`, 'Left']}
+                formatter={(value: number, name: string) => [
+                  name === 'count' ? `${value.toLocaleString()} properties` : `$${value.toLocaleString()}`,
+                  name === 'count' ? 'Count' : 'Avg Price'
+                ]}
+                labelFormatter={(label) => `${label} Bedrooms`}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                 {data.map((_, index) => (
@@ -55,4 +62,4 @@ const TenureChart = () => {
   );
 };
 
-export default TenureChart;
+export default BedroomsChart;
