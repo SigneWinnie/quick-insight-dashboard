@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import Sidebar from "@/components/dashboard/Sidebar";
 import OverviewPage from "./OverviewPage";
 import PriceTrendsPage from "./PriceTrendsPage";
 import LocationAnalysisPage from "./LocationAnalysisPage";
@@ -26,18 +27,24 @@ const Index = () => {
   
   return (
     <DashboardProvider>
-      <div className="min-h-screen bg-background">
-        <DashboardHeader currentPage={currentPage} onNavigate={setCurrentPage} />
+      <div className="min-h-screen bg-background flex">
+        {/* Sidebar Navigation */}
+        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         
-        <main className="container mx-auto px-4 py-6">
-          {renderPage()}
-        </main>
-        
-        <footer className="bg-primary/5 border-t border-primary/20 py-4 mt-8">
-          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-            Real Estate Analytics Dashboard • House Price Prediction Dataset Analysis
-          </div>
-        </footer>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-screen">
+          <DashboardHeader currentPage={currentPage} onNavigate={setCurrentPage} />
+          
+          <main className="flex-1 px-6 py-5">
+            {renderPage()}
+          </main>
+          
+          <footer className="border-t border-border/50 py-3 px-6">
+            <div className="text-center text-xs text-muted-foreground">
+              Real Estate Analytics Dashboard • House Price Prediction Dataset
+            </div>
+          </footer>
+        </div>
       </div>
     </DashboardProvider>
   );

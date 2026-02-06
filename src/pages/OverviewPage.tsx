@@ -1,15 +1,14 @@
-import { Building, DollarSign, Home, TrendingUp, Droplets } from "lucide-react";
+import { Building, DollarSign, TrendingUp, Droplets } from "lucide-react";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { calculateMetrics } from "@/lib/houseData";
 import { useMemo } from "react";
 import KPICard from "@/components/dashboard/KPICard";
-import FilterPanel from "@/components/dashboard/FilterPanel";
 import BedroomsChart from "@/components/dashboard/BedroomsChart";
 import PriceCategoryChart from "@/components/dashboard/PriceCategoryChart";
 import ConditionChart from "@/components/dashboard/ConditionChart";
 
 const OverviewPage = () => {
-  const { filteredData, isLoading } = useDashboard();
+  const { filteredData, allData, isLoading } = useDashboard();
   
   const metrics = useMemo(() => {
     if (filteredData.length === 0) return null;
@@ -36,22 +35,26 @@ const OverviewPage = () => {
     if (value >= 1000000) return `$${(value / 1000000).toFixed(0)}M`;
     return `$${(value / 1000).toFixed(0)}K`;
   };
+
+  const filteredPct = Math.round((filteredData.length / allData.length) * 100);
   
   return (
-    <div className="space-y-6">
-      <FilterPanel />
-      
+    <div className="space-y-5">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="Total Properties"
           value={metrics.totalProperties.toLocaleString()}
           icon={Building}
+          percentage={filteredPct}
+          color="hsl(var(--chart-1))"
         />
         <KPICard
           title="Average Price"
           value={formatPrice(metrics.avgPrice)}
           icon={DollarSign}
+          percentage={Math.min(Math.round(metrics.avgPrice / 10000), 100)}
+          color="hsl(var(--chart-2))"
         />
         <KPICard
           title="Total Market Value"
@@ -63,16 +66,17 @@ const OverviewPage = () => {
           value={`+${metrics.waterfrontPremium.toFixed(0)}%`}
           icon={Droplets}
           subtitle="vs non-waterfront"
+          percentage={Math.min(Math.round(metrics.waterfrontPremium), 100)}
+          color="hsl(var(--chart-4))"
         />
       </div>
       
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <BedroomsChart />
         <PriceCategoryChart />
       </div>
       
-      {/* Full Width Chart */}
       <ConditionChart />
     </div>
   );

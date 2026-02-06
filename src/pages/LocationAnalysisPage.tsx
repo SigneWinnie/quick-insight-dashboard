@@ -1,4 +1,3 @@
-import FilterPanel from "@/components/dashboard/FilterPanel";
 import ZipcodeChart from "@/components/dashboard/ZipcodeChart";
 import ZipcodeVolumeChart from "@/components/dashboard/ZipcodeVolumeChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +9,7 @@ import { MapPin, DollarSign, Home, TrendingUp } from "lucide-react";
 const LocationAnalysisPage = () => {
   const { filteredData } = useDashboard();
   
-  const topZipcodes = useMemo(() => {
-    return groupByZipcode(filteredData).slice(0, 5);
-  }, [filteredData]);
+  const topZipcodes = useMemo(() => groupByZipcode(filteredData).slice(0, 5), [filteredData]);
   
   const formatPrice = (value: number) => {
     if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
@@ -20,85 +17,81 @@ const LocationAnalysisPage = () => {
   };
   
   return (
-    <div className="space-y-6">
-      <FilterPanel />
-      
-      {/* Top Zipcodes Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <div className="space-y-5">
+      {/* Top Zipcodes */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {topZipcodes.map((zip, index) => (
-          <Card key={zip.zipcode} className="border-primary/20 shadow-sm">
+          <Card key={zip.zipcode} className="border-border/50 bg-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                  index === 1 ? 'bg-gray-100 text-gray-600' :
-                  index === 2 ? 'bg-orange-100 text-orange-700' :
-                  'bg-primary/10 text-primary'
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                  index === 0 ? 'bg-primary/20 text-primary' :
+                  index === 1 ? 'bg-muted text-muted-foreground' :
+                  index === 2 ? 'bg-destructive/20 text-destructive' :
+                  'bg-muted text-muted-foreground'
                 }`}>
                   {index + 1}
                 </div>
-                <MapPin className="h-4 w-4 text-primary" />
-                <span className="font-semibold text-foreground">{zip.zipcode}</span>
+                <MapPin className="h-3.5 w-3.5 text-primary" />
+                <span className="font-semibold text-sm text-foreground">{zip.zipcode}</span>
               </div>
               <p className="text-lg font-bold text-primary">{formatPrice(zip.avgPrice)}</p>
-              <p className="text-xs text-muted-foreground">{zip.count} properties</p>
+              <p className="text-[10px] text-muted-foreground">{zip.count} properties</p>
             </CardContent>
           </Card>
         ))}
       </div>
       
-      {/* Zipcode Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <ZipcodeChart />
         <ZipcodeVolumeChart />
       </div>
       
-      {/* Location Insights */}
-      <Card className="border-primary/20 shadow-sm">
+      {/* Insights */}
+      <Card className="border-border/50 bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
+          <CardTitle className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
             Location Insights
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-primary/5 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-muted/50 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="h-5 w-5 text-primary" />
-                <span className="font-medium">Highest Avg Price</span>
+                <DollarSign className="h-4 w-4 text-primary" />
+                <span className="font-medium text-sm">Highest Avg Price</span>
               </div>
               {topZipcodes[0] && (
                 <>
                   <p className="text-2xl font-bold text-primary">{topZipcodes[0].zipcode}</p>
-                  <p className="text-sm text-muted-foreground">{formatPrice(topZipcodes[0].avgPrice)} average</p>
+                  <p className="text-xs text-muted-foreground">{formatPrice(topZipcodes[0].avgPrice)} average</p>
                 </>
               )}
             </div>
-            
-            <div className="p-4 bg-primary/5 rounded-lg">
+            <div className="p-4 bg-muted/50 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
-                <Home className="h-5 w-5 text-primary" />
-                <span className="font-medium">Most Active Market</span>
+                <Home className="h-4 w-4 text-accent" />
+                <span className="font-medium text-sm">Most Active Market</span>
               </div>
               {(() => {
                 const byVolume = [...topZipcodes].sort((a, b) => b.count - a.count);
                 return byVolume[0] && (
                   <>
-                    <p className="text-2xl font-bold text-primary">{byVolume[0].zipcode}</p>
-                    <p className="text-sm text-muted-foreground">{byVolume[0].count} sales</p>
+                    <p className="text-2xl font-bold text-accent">{byVolume[0].zipcode}</p>
+                    <p className="text-xs text-muted-foreground">{byVolume[0].count} sales</p>
                   </>
                 );
               })()}
             </div>
-            
-            <div className="p-4 bg-primary/5 rounded-lg">
+            <div className="p-4 bg-muted/50 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span className="font-medium">Geographic Coverage</span>
+                <MapPin className="h-4 w-4 text-chart-4" />
+                <span className="font-medium text-sm">Geographic Coverage</span>
               </div>
-              <p className="text-2xl font-bold text-primary">{groupByZipcode(filteredData).length}</p>
-              <p className="text-sm text-muted-foreground">unique zipcodes</p>
+              <p className="text-2xl font-bold text-chart-4">{groupByZipcode(filteredData).length}</p>
+              <p className="text-xs text-muted-foreground">unique zipcodes</p>
             </div>
           </div>
         </CardContent>
