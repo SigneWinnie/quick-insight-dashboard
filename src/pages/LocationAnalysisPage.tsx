@@ -1,5 +1,5 @@
 import ZipcodeChart from "@/components/dashboard/ZipcodeChart";
-import ZipcodeVolumeChart from "@/components/dashboard/ZipcodeVolumeChart";
+import LocationMap from "@/components/dashboard/LocationMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { groupByZipcode } from "@/lib/houseData";
@@ -44,8 +44,8 @@ const LocationAnalysisPage = () => {
       
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <LocationMap />
         <ZipcodeChart />
-        <ZipcodeVolumeChart />
       </div>
       
       {/* Insights */}
